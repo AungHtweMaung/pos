@@ -1,0 +1,28 @@
+/* Bootstrap 5.3 + icons drive the whole UI (spec §7). Keep custom CSS to a
+   minimum and lean on Bootstrap theme variables so light & dark both stay
+   legible. */
+@import 'bootstrap/dist/css/bootstrap.min.css';
+@import 'bootstrap-icons/font/bootstrap-icons.css';
+
+html,
+body,
+#app {
+    min-height: 100vh;
+}
+
+body {
+    background-color: var(--bs-body-bg);
+    color: var(--bs-body-color);
+}
+
+/* Full-height centered shell for the login screen. */
+.auth-shell {
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+:root {
+    color-scheme: light dark;
+}
