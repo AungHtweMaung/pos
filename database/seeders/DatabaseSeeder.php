@@ -37,5 +37,12 @@ class DatabaseSeeder extends Seeder
                 'is_active' => true,
             ]
         );
+
+        // Only seed the demo catalog when the products table is empty so
+        // repeated `db:seed` runs don't stack duplicates or hit the barcode
+        // unique index.
+        if (\App\Models\Product::query()->doesntExist()) {
+            $this->call(InventorySeeder::class);
+        }
     }
 }
