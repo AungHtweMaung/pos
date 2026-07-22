@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\Auth\AuthenticatedSessionController;
 use App\Http\Controllers\DashboardController;
+use App\Http\Controllers\Users\UserController;
 use Illuminate\Support\Facades\Route;
 
 // Guests: login page + submit. The `throttle` here is a coarse network-level
@@ -23,4 +24,23 @@ Route::middleware('auth')->group(function () {
 
     Route::post('logout', [AuthenticatedSessionController::class, 'destroy'])
         ->name('logout');
+
+    // Cashier / account management (§8.3) — admin only. Deactivate-not-delete
+    // per spec §4 so past sales still resolve their cashier.
+    Route::middleware('can:manage-users')
+        ->prefix('cashiers')
+        ->name('cashiers.')
+        ->group(function () {
+            Route::get('/', [UserController::class, 'index'])->name('index');
+            Route::get('create', [UserController::class, 'create'])->name('create');
+            Route::post('/', [UserController::class, 'store'])->name('store');
+            Route::get('{user}/edit', [UserController::class, 'edit'])->name('edit');
+            Route::put('{user}', [UserController::class, 'update'])->name('update');
+            Route::put('{user}/password', [UserController::class, 'resetPassword'])
+                ->name('reset-password');
+            Route::post('{user}/deactivate', [UserController::class, 'deactivate'])
+                ->name('deactivate');
+            Route::post('{user}/activate', [UserController::class, 'activate'])
+                ->name('activate');
+        });
 });

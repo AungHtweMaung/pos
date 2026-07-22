@@ -6,15 +6,15 @@ import ThemeToggle from '../Components/ThemeToggle';
 // dashboard aren't built yet, so their links are shown disabled to convey the
 // structure without dead-ending on missing routes.
 const NAV_ITEMS = [
-    { key: 'pos', label: 'Sales / POS', icon: 'bi-cart', adminOnly: false, ready: false },
-    { key: 'inventory', label: 'Inventory', icon: 'bi-box-seam', adminOnly: true, ready: false },
-    { key: 'shift', label: 'End of Shift', icon: 'bi-cash-stack', adminOnly: false, ready: false },
-    { key: 'cashiers', label: 'Cashiers', icon: 'bi-people', adminOnly: true, ready: false },
-    { key: 'reports', label: 'Reports', icon: 'bi-graph-up', adminOnly: true, ready: false },
+    { key: 'pos', label: 'Sales / POS', icon: 'bi-cart', adminOnly: false, href: null },
+    { key: 'inventory', label: 'Inventory', icon: 'bi-box-seam', adminOnly: true, href: null },
+    { key: 'shift', label: 'End of Shift', icon: 'bi-cash-stack', adminOnly: false, href: null },
+    { key: 'cashiers', label: 'Cashiers', icon: 'bi-people', adminOnly: true, href: '/cashiers' },
+    { key: 'reports', label: 'Reports', icon: 'bi-graph-up', adminOnly: true, href: null },
 ];
 
 export default function AuthenticatedLayout({ header, children }) {
-    const { auth, app } = usePage().props;
+    const { auth, app, flash } = usePage().props;
     const user = auth.user;
 
     const visibleItems = NAV_ITEMS.filter(
@@ -57,15 +57,27 @@ export default function AuthenticatedLayout({ header, children }) {
                             </li>
                             {visibleItems.map((item) => (
                                 <li className="nav-item" key={item.key}>
-                                    <span
-                                        className="nav-link disabled d-inline-flex align-items-center"
-                                        aria-disabled="true"
-                                        title="Coming soon"
-                                    >
-                                        <i className={`bi ${item.icon} me-1`}></i>
-                                        {item.label}
-                                        <span className="badge text-bg-secondary ms-2">soon</span>
-                                    </span>
+                                    {item.href ? (
+                                        <Link
+                                            className="nav-link d-inline-flex align-items-center"
+                                            href={item.href}
+                                        >
+                                            <i className={`bi ${item.icon} me-1`}></i>
+                                            {item.label}
+                                        </Link>
+                                    ) : (
+                                        <span
+                                            className="nav-link disabled d-inline-flex align-items-center"
+                                            aria-disabled="true"
+                                            title="Coming soon"
+                                        >
+                                            <i className={`bi ${item.icon} me-1`}></i>
+                                            {item.label}
+                                            <span className="badge text-bg-secondary ms-2">
+                                                soon
+                                            </span>
+                                        </span>
+                                    )}
                                 </li>
                             ))}
                         </ul>
@@ -122,7 +134,21 @@ export default function AuthenticatedLayout({ header, children }) {
                 </header>
             )}
 
-            <main className="container flex-grow-1 py-4">{children}</main>
+            <main className="container flex-grow-1 py-4">
+                {flash?.success && (
+                    <div className="alert alert-success d-flex align-items-center" role="alert">
+                        <i className="bi bi-check-circle me-2"></i>
+                        <div>{flash.success}</div>
+                    </div>
+                )}
+                {flash?.error && (
+                    <div className="alert alert-danger d-flex align-items-center" role="alert">
+                        <i className="bi bi-x-circle me-2"></i>
+                        <div>{flash.error}</div>
+                    </div>
+                )}
+                {children}
+            </main>
 
             <footer className="border-top py-3 mt-auto bg-body-tertiary">
                 <div className="container text-center small text-body-secondary">

@@ -1,4 +1,4 @@
-import { Head, usePage } from '@inertiajs/react';
+import { Head, Link, usePage } from '@inertiajs/react';
 import AuthenticatedLayout from '../Layouts/AuthenticatedLayout';
 
 // Cards mirror the §8 modules. `admin` marks admin-only areas; the grid is
@@ -31,6 +31,7 @@ const CARDS = [
         text: 'Create and manage cashier & admin accounts.',
         icon: 'bi-people',
         admin: true,
+        href: '/cashiers',
     },
     {
         key: 'reports',
@@ -86,9 +87,18 @@ export default function Dashboard() {
                                 </p>
                             </div>
                             <div className="card-footer bg-transparent border-0 pb-3">
-                                <button className="btn btn-sm btn-outline-primary" disabled>
-                                    Coming soon
-                                </button>
+                                {card.href ? (
+                                    <Link
+                                        className="btn btn-sm btn-outline-primary"
+                                        href={card.href}
+                                    >
+                                        Open <i className="bi bi-arrow-right ms-1"></i>
+                                    </Link>
+                                ) : (
+                                    <button className="btn btn-sm btn-outline-primary" disabled>
+                                        Coming soon
+                                    </button>
+                                )}
                             </div>
                         </div>
                     </div>
