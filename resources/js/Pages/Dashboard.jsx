@@ -10,6 +10,15 @@ const CARDS = [
         text: 'Scan or search items, take payment, print a receipt.',
         icon: 'bi-cart-plus',
         admin: false,
+        href: '/pos',
+    },
+    {
+        key: 'sales',
+        title: 'Sales history',
+        text: 'Every completed, voided or refunded sale.',
+        icon: 'bi-receipt',
+        admin: true,
+        href: '/sales',
     },
     {
         key: 'shift',

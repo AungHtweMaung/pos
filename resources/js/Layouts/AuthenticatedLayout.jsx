@@ -6,7 +6,8 @@ import ThemeToggle from '../Components/ThemeToggle';
 // dashboard aren't built yet, so their links are shown disabled to convey the
 // structure without dead-ending on missing routes.
 const NAV_ITEMS = [
-    { key: 'pos', label: 'Sales / POS', icon: 'bi-cart', adminOnly: false, href: null },
+    { key: 'pos', label: 'Sales / POS', icon: 'bi-cart', adminOnly: false, href: '/pos' },
+    { key: 'sales', label: 'Sales history', icon: 'bi-receipt', adminOnly: true, href: '/sales' },
     { key: 'inventory', label: 'Inventory', icon: 'bi-box-seam', adminOnly: true, href: '/inventory/products' },
     { key: 'low-stock', label: 'Low Stock', icon: 'bi-exclamation-triangle', adminOnly: true, href: '/inventory/low-stock' },
     { key: 'shift', label: 'End of Shift', icon: 'bi-cash-stack', adminOnly: false, href: null },

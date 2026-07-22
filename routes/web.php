@@ -7,6 +7,8 @@ use App\Http\Controllers\Inventory\ProductController;
 use App\Http\Controllers\Inventory\SaleUnitController;
 use App\Http\Controllers\Inventory\StockAdjustmentController;
 use App\Http\Controllers\Inventory\VariantController;
+use App\Http\Controllers\Sales\LookupController;
+use App\Http\Controllers\Sales\SaleController;
 use Illuminate\Support\Facades\Route;
 
 // Guests: login page + submit. The `throttle` here is a coarse network-level
@@ -60,4 +62,28 @@ Route::middleware('auth')->group(function () {
                     ->name('products.variants.stock-adjustments.store');
             });
         });
+
+    // Sales / POS (§8.1). Cart + checkout are open to any signed-in user
+    // (cashier + admin); history + void are admin-only.
+    Route::prefix('pos')->name('pos.')->group(function () {
+        Route::get('/', [SaleController::class, 'create'])->name('cart');
+        Route::post('/', [SaleController::class, 'store'])->name('store');
+        Route::get('lookup', LookupController::class)->name('lookup');
+    });
+
+    Route::prefix('sales')->name('sales.')->group(function () {
+        // Receipt + detail: cashier can view own, admin can view any (the
+        // controller enforces this).
+        Route::get('{sale}/receipt', [SaleController::class, 'receipt'])->name('receipt');
+        Route::get('{sale}', [SaleController::class, 'show'])->name('show');
+
+        // History + void are admin-only.
+        Route::middleware('can:view-reports')
+            ->get('/', [SaleController::class, 'index'])
+            ->name('index');
+
+        Route::middleware('can:void-sale')
+            ->post('{sale}/void', [SaleController::class, 'void'])
+            ->name('void');
+    });
 });
