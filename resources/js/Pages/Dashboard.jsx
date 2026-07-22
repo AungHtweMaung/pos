@@ -49,6 +49,7 @@ const CARDS = [
         text: 'Create and manage cashier & admin accounts.',
         icon: 'bi-people',
         admin: true,
+        href: '/cashiers',
     },
     {
         key: 'reports',
@@ -105,7 +106,10 @@ export default function Dashboard() {
                             </div>
                             <div className="card-footer bg-transparent border-0 pb-3">
                                 {card.href ? (
-                                    <Link className="btn btn-sm btn-outline-primary" href={card.href}>
+                                    <Link
+                                        className="btn btn-sm btn-outline-primary"
+                                        href={card.href}
+                                    >
                                         Open <i className="bi bi-arrow-right ms-1"></i>
                                     </Link>
                                 ) : (

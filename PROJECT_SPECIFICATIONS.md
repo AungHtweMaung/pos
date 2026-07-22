@@ -206,7 +206,6 @@ a single bottle or as a 6-pack — without splitting stock.
 4. Checkout — system computes subtotal, tax, grand total
 5. Choose payment method:
    - **Cash** — enter amount tendered, system computes change
-   - **Card** — send to card reader, wait for approval/decline
    - **QR transfer** — cashier reads out a short reference note; buyer
      transfers the total via their bank/wallet app including that note;
      cashier manually matches the incoming transfer to the note and confirms

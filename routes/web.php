@@ -9,6 +9,7 @@ use App\Http\Controllers\Inventory\StockAdjustmentController;
 use App\Http\Controllers\Inventory\VariantController;
 use App\Http\Controllers\Sales\LookupController;
 use App\Http\Controllers\Sales\SaleController;
+use App\Http\Controllers\Users\UserController;
 use Illuminate\Support\Facades\Route;
 
 // Guests: login page + submit. The `throttle` here is a coarse network-level
@@ -86,4 +87,23 @@ Route::middleware('auth')->group(function () {
             ->post('{sale}/void', [SaleController::class, 'void'])
             ->name('void');
     });
+
+    // Cashier / account management (§8.3) — admin only. Deactivate-not-delete
+    // per spec §4 so past sales still resolve their cashier.
+    Route::middleware('can:manage-users')
+        ->prefix('cashiers')
+        ->name('cashiers.')
+        ->group(function () {
+            Route::get('/', [UserController::class, 'index'])->name('index');
+            Route::get('create', [UserController::class, 'create'])->name('create');
+            Route::post('/', [UserController::class, 'store'])->name('store');
+            Route::get('{user}/edit', [UserController::class, 'edit'])->name('edit');
+            Route::put('{user}', [UserController::class, 'update'])->name('update');
+            Route::put('{user}/password', [UserController::class, 'resetPassword'])
+                ->name('reset-password');
+            Route::post('{user}/deactivate', [UserController::class, 'deactivate'])
+                ->name('deactivate');
+            Route::post('{user}/activate', [UserController::class, 'activate'])
+                ->name('activate');
+        });
 });

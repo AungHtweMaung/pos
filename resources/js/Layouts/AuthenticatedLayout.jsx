@@ -11,7 +11,7 @@ const NAV_ITEMS = [
     { key: 'inventory', label: 'Inventory', icon: 'bi-box-seam', adminOnly: true, href: '/inventory/products' },
     { key: 'low-stock', label: 'Low Stock', icon: 'bi-exclamation-triangle', adminOnly: true, href: '/inventory/low-stock' },
     { key: 'shift', label: 'End of Shift', icon: 'bi-cash-stack', adminOnly: false, href: null },
-    { key: 'cashiers', label: 'Cashiers', icon: 'bi-people', adminOnly: true, href: null },
+    { key: 'cashiers', label: 'Cashiers', icon: 'bi-people', adminOnly: true, href: '/cashiers' },
     { key: 'reports', label: 'Reports', icon: 'bi-graph-up', adminOnly: true, href: null },
 ];
 
@@ -60,7 +60,10 @@ export default function AuthenticatedLayout({ header, children }) {
                             {visibleItems.map((item) => (
                                 <li className="nav-item" key={item.key}>
                                     {item.href ? (
-                                        <Link className="nav-link d-inline-flex align-items-center" href={item.href}>
+                                        <Link
+                                            className="nav-link d-inline-flex align-items-center"
+                                            href={item.href}
+                                        >
                                             <i className={`bi ${item.icon} me-1`}></i>
                                             {item.label}
                                         </Link>
@@ -72,7 +75,9 @@ export default function AuthenticatedLayout({ header, children }) {
                                         >
                                             <i className={`bi ${item.icon} me-1`}></i>
                                             {item.label}
-                                            <span className="badge text-bg-secondary ms-2">soon</span>
+                                            <span className="badge text-bg-secondary ms-2">
+                                                soon
+                                            </span>
                                         </span>
                                     )}
                                 </li>
