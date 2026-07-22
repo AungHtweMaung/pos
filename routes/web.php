@@ -9,6 +9,7 @@ use App\Http\Controllers\Inventory\StockAdjustmentController;
 use App\Http\Controllers\Inventory\VariantController;
 use App\Http\Controllers\Sales\LookupController;
 use App\Http\Controllers\Sales\SaleController;
+use App\Http\Controllers\Shifts\ShiftController;
 use App\Http\Controllers\Users\UserController;
 use Illuminate\Support\Facades\Route;
 
@@ -106,4 +107,14 @@ Route::middleware('auth')->group(function () {
             Route::post('{user}/activate', [UserController::class, 'activate'])
                 ->name('activate');
         });
+
+    // End of Shift (§8.4). Cashier + admin run their own drawer; the history
+    // view across all cashiers is admin-only (view-all-shifts gate).
+    Route::get('shift', [ShiftController::class, 'index'])->name('shift.index');
+    Route::post('shift/open', [ShiftController::class, 'open'])->name('shift.open');
+    Route::post('shift/{shift}/close', [ShiftController::class, 'close'])->name('shift.close');
+
+    Route::middleware('can:view-all-shifts')
+        ->get('shifts', [ShiftController::class, 'history'])
+        ->name('shifts.history');
 });

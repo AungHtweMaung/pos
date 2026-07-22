@@ -10,7 +10,7 @@ const NAV_ITEMS = [
     { key: 'sales', label: 'Sales history', icon: 'bi-receipt', adminOnly: true, href: '/sales' },
     { key: 'inventory', label: 'Inventory', icon: 'bi-box-seam', adminOnly: true, href: '/inventory/products' },
     { key: 'low-stock', label: 'Low Stock', icon: 'bi-exclamation-triangle', adminOnly: true, href: '/inventory/low-stock' },
-    { key: 'shift', label: 'End of Shift', icon: 'bi-cash-stack', adminOnly: false, href: null },
+    { key: 'shift', label: 'End of Shift', icon: 'bi-cash-stack', adminOnly: false, href: '/shift' },
     { key: 'cashiers', label: 'Cashiers', icon: 'bi-people', adminOnly: true, href: '/cashiers' },
     { key: 'reports', label: 'Reports', icon: 'bi-graph-up', adminOnly: true, href: null },
 ];

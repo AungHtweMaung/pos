@@ -26,6 +26,7 @@ const CARDS = [
         text: 'Count the drawer and reconcile against expected cash.',
         icon: 'bi-cash-stack',
         admin: false,
+        href: '/shift',
     },
     {
         key: 'inventory',

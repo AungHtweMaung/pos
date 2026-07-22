@@ -11,7 +11,7 @@ const money = (n) =>
 
 const PAYMENT_METHODS = [
     { key: 'cash', label: 'Cash', icon: 'bi-cash-coin' },
-    { key: 'card', label: 'Card', icon: 'bi-credit-card' },
+    // { key: 'card', label: 'Card', icon: 'bi-credit-card' },
     { key: 'qr', label: 'QR transfer', icon: 'bi-qr-code' },
 ];
 
@@ -548,13 +548,13 @@ export default function Cart() {
                                 </div>
                             )}
 
-                            {paymentMethod === 'card' && (
+                            {/* {paymentMethod === 'card' && (
                                 <div className="alert alert-info py-2 small mb-3">
                                     <i className="bi bi-info-circle me-1"></i>
                                     Charge the card on the reader, then confirm below when
                                     approved.
                                 </div>
-                            )}
+                            )} */}
 
                             {pageErrors?.items && (
                                 <div className="alert alert-danger py-2 small">
