@@ -1,4 +1,4 @@
-import { Head, usePage } from '@inertiajs/react';
+import { Head, Link, usePage } from '@inertiajs/react';
 import AuthenticatedLayout from '../Layouts/AuthenticatedLayout';
 
 // Cards mirror the §8 modules. `admin` marks admin-only areas; the grid is
@@ -10,6 +10,15 @@ const CARDS = [
         text: 'Scan or search items, take payment, print a receipt.',
         icon: 'bi-cart-plus',
         admin: false,
+        href: '/pos',
+    },
+    {
+        key: 'sales',
+        title: 'Sales history',
+        text: 'Every completed, voided or refunded sale.',
+        icon: 'bi-receipt',
+        admin: true,
+        href: '/sales',
     },
     {
         key: 'shift',
@@ -17,6 +26,7 @@ const CARDS = [
         text: 'Count the drawer and reconcile against expected cash.',
         icon: 'bi-cash-stack',
         admin: false,
+        href: '/shift',
     },
     {
         key: 'inventory',
@@ -24,6 +34,15 @@ const CARDS = [
         text: 'Products, variants, sale units and stock adjustments.',
         icon: 'bi-box-seam',
         admin: true,
+        href: '/inventory/products',
+    },
+    {
+        key: 'low-stock',
+        title: 'Low Stock',
+        text: 'Variants at or below their re-order threshold.',
+        icon: 'bi-exclamation-triangle',
+        admin: true,
+        href: '/inventory/low-stock',
     },
     {
         key: 'cashiers',
@@ -31,6 +50,7 @@ const CARDS = [
         text: 'Create and manage cashier & admin accounts.',
         icon: 'bi-people',
         admin: true,
+        href: '/cashiers',
     },
     {
         key: 'reports',
@@ -38,6 +58,7 @@ const CARDS = [
         text: 'Daily sales, best-sellers, void/refund log.',
         icon: 'bi-graph-up',
         admin: true,
+        href: '/reports',
     },
 ];
 
@@ -86,9 +107,18 @@ export default function Dashboard() {
                                 </p>
                             </div>
                             <div className="card-footer bg-transparent border-0 pb-3">
-                                <button className="btn btn-sm btn-outline-primary" disabled>
-                                    Coming soon
-                                </button>
+                                {card.href ? (
+                                    <Link
+                                        className="btn btn-sm btn-outline-primary"
+                                        href={card.href}
+                                    >
+                                        Open <i className="bi bi-arrow-right ms-1"></i>
+                                    </Link>
+                                ) : (
+                                    <button className="btn btn-sm btn-outline-primary" disabled>
+                                        Coming soon
+                                    </button>
+                                )}
                             </div>
                         </div>
                     </div>
