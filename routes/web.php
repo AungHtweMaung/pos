@@ -7,6 +7,7 @@ use App\Http\Controllers\Inventory\ProductController;
 use App\Http\Controllers\Inventory\SaleUnitController;
 use App\Http\Controllers\Inventory\StockAdjustmentController;
 use App\Http\Controllers\Inventory\VariantController;
+use App\Http\Controllers\Reports\ReportController;
 use App\Http\Controllers\Sales\LookupController;
 use App\Http\Controllers\Sales\SaleController;
 use App\Http\Controllers\Shifts\ShiftController;
@@ -117,4 +118,9 @@ Route::middleware('auth')->group(function () {
     Route::middleware('can:view-all-shifts')
         ->get('shifts', [ShiftController::class, 'history'])
         ->name('shifts.history');
+
+    // Reporting (§8.5) — admin only. Daily summary, best-sellers, void log.
+    Route::middleware('can:view-reports')
+        ->get('reports', [ReportController::class, 'index'])
+        ->name('reports.index');
 });

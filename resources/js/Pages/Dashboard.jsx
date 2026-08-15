@@ -58,6 +58,7 @@ const CARDS = [
         text: 'Daily sales, best-sellers, void/refund log.',
         icon: 'bi-graph-up',
         admin: true,
+        href: '/reports',
     },
 ];
 

@@ -103,9 +103,7 @@ class ShiftTest extends TestCase
 
         $this->cashSale($cashier, 30);
         $this->cashSale($cashier, 20);
-        // Card sale — must NOT count toward drawer.
-        $this->cashSale($cashier, 999, method: 'card');
-        // QR sale — must NOT count.
+        // QR sale — must NOT count toward the drawer.
         $this->cashSale($cashier, 500, method: 'qr');
 
         // 100 float + 30 + 20 = 150

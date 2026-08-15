@@ -20,7 +20,7 @@ return new class extends Migration
             $table->decimal('tax_total', 12, 2);
             $table->decimal('discount_total', 12, 2);
             $table->decimal('grand_total', 12, 2);
-            $table->enum('payment_method', ['cash', 'card', 'qr']);
+            $table->enum('payment_method', ['cash', 'qr']);
             $table->decimal('cash_tendered', 12, 2)->nullable();
             $table->decimal('change_due', 12, 2)->nullable();
             $table->string('qr_reference_note')->nullable();

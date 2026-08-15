@@ -16,7 +16,6 @@ class Sale extends Model
     public const STATUS_REFUNDED = 'refunded';
 
     public const PAYMENT_CASH = 'cash';
-    public const PAYMENT_CARD = 'card';
     public const PAYMENT_QR = 'qr';
 
     protected $fillable = [

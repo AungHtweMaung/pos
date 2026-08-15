@@ -24,7 +24,6 @@ class StoreSaleRequest extends FormRequest
 
             'payment_method' => ['required', Rule::in([
                 Sale::PAYMENT_CASH,
-                Sale::PAYMENT_CARD,
                 Sale::PAYMENT_QR,
             ])],
 

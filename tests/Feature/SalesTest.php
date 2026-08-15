@@ -241,19 +241,21 @@ class SalesTest extends TestCase
         $this->assertNull($sale->cash_tendered);
     }
 
-    public function test_card_sale_needs_no_cash_or_qr_fields(): void
+    public function test_card_payment_method_is_rejected(): void
     {
+        // Only cash and QR are supported (no card reader).
         $seed = $this->seedCoke();
         $this->actingAs($this->cashier())
+            ->from('/pos')
             ->post('/pos', [
                 'items' => [
                     ['sale_unit_id' => $seed['single']->id, 'quantity' => 1, 'discount' => 0],
                 ],
                 'payment_method' => 'card',
             ])
-            ->assertRedirect();
+            ->assertSessionHasErrors('payment_method');
 
-        $this->assertSame('card', Sale::firstOrFail()->payment_method);
+        $this->assertSame(0, Sale::count());
     }
 
     // ----- Validation -----------------------------------------------------

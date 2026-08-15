@@ -12,7 +12,7 @@ const NAV_ITEMS = [
     { key: 'low-stock', label: 'Low Stock', icon: 'bi-exclamation-triangle', adminOnly: true, href: '/inventory/low-stock' },
     { key: 'shift', label: 'End of Shift', icon: 'bi-cash-stack', adminOnly: false, href: '/shift' },
     { key: 'cashiers', label: 'Cashiers', icon: 'bi-people', adminOnly: true, href: '/cashiers' },
-    { key: 'reports', label: 'Reports', icon: 'bi-graph-up', adminOnly: true, href: null },
+    { key: 'reports', label: 'Reports', icon: 'bi-graph-up', adminOnly: true, href: '/reports' },
 ];
 
 export default function AuthenticatedLayout({ header, children }) {
