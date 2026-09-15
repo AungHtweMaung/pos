@@ -13,6 +13,14 @@ const CARDS = [
         href: '/pos',
     },
     {
+        key: 'my-sales',
+        title: 'My Sales',
+        text: 'Your own sales — reprint a receipt or void a fresh mistake.',
+        icon: 'bi-receipt-cutoff',
+        admin: false,
+        href: '/my-sales',
+    },
+    {
         key: 'sales',
         title: 'Sales history',
         text: 'Every completed, voided or refunded sale.',

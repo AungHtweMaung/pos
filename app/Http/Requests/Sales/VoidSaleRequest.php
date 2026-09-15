@@ -8,8 +8,10 @@ class VoidSaleRequest extends FormRequest
 {
     public function authorize(): bool
     {
-        // Void/refund is admin-only per spec §5.
-        return $this->user()?->can('void-sale') ?? false;
+        // Any authenticated user may reach the void action; the controller
+        // enforces who can actually void which sale (admin: any; cashier:
+        // own sale during an open shift).
+        return $this->user() !== null;
     }
 
     public function rules(): array

@@ -6,6 +6,7 @@ use App\Enums\UserRole;
 use App\Models\Product;
 use App\Models\Sale;
 use App\Models\SaleUnit;
+use App\Models\Shift;
 use App\Models\User;
 use App\Models\Variant;
 use Illuminate\Foundation\Testing\RefreshDatabase;
@@ -274,16 +275,103 @@ class SalesTest extends TestCase
 
     // ----- Void / refund --------------------------------------------------
 
-    public function test_cashier_cannot_void_a_sale(): void
+    public function test_cashier_cannot_void_another_cashiers_sale(): void
     {
         $seed = $this->seedCoke();
-        $sale = $this->rungUpSale($seed['single']);
+        $owner = $this->cashier();
+        $sale = $this->rungUpSale($seed['single'], as: $owner);
 
-        $this->actingAs($this->cashier())
+        // A different cashier, even with their own open shift, can't void it.
+        $intruder = $this->cashier();
+        Shift::create([
+            'cashier_id' => $intruder->id,
+            'opened_at' => now()->subMinute(),
+            'opening_float' => 0,
+        ]);
+
+        $this->actingAs($intruder)
             ->post("/sales/{$sale->id}/void", ['reason' => 'wrong item'])
             ->assertForbidden();
 
         $this->assertSame('completed', $sale->fresh()->status);
+    }
+
+    public function test_cashier_can_void_own_sale_during_open_shift(): void
+    {
+        $seed = $this->seedCoke(stock: 100);
+        $cashier = $this->cashier();
+
+        Shift::create([
+            'cashier_id' => $cashier->id,
+            'opened_at' => now()->subMinutes(5),
+            'opening_float' => 0,
+        ]);
+
+        $sale = $this->rungUpSale($seed['single'], quantity: 4, as: $cashier);
+        $this->assertSame(96, $seed['variant']->fresh()->stock_qty);
+
+        $this->actingAs($cashier)
+            ->post("/sales/{$sale->id}/void", ['reason' => 'wrong item scanned'])
+            ->assertRedirect();
+
+        $sale->refresh();
+        $this->assertSame('voided', $sale->status);
+        $this->assertSame($cashier->id, $sale->voided_by);
+        $this->assertSame(100, $seed['variant']->fresh()->stock_qty);
+    }
+
+    public function test_cashier_cannot_void_own_sale_without_an_open_shift(): void
+    {
+        $seed = $this->seedCoke();
+        $cashier = $this->cashier();
+        $sale = $this->rungUpSale($seed['single'], as: $cashier);
+
+        // No open shift → cannot self-void.
+        $this->actingAs($cashier)
+            ->post("/sales/{$sale->id}/void", ['reason' => 'oops'])
+            ->assertForbidden();
+
+        $this->assertSame('completed', $sale->fresh()->status);
+    }
+
+    public function test_cashier_cannot_void_sale_rung_before_current_shift(): void
+    {
+        $seed = $this->seedCoke();
+        $cashier = $this->cashier();
+
+        $sale = $this->rungUpSale($seed['single'], as: $cashier);
+        // The sale happened an hour ago, in an earlier (now closed) shift.
+        $sale->forceFill(['created_at' => now()->subHour()])->save();
+
+        // The current shift only opened just now.
+        Shift::create([
+            'cashier_id' => $cashier->id,
+            'opened_at' => now(),
+            'opening_float' => 0,
+        ]);
+
+        $this->actingAs($cashier)
+            ->post("/sales/{$sale->id}/void", ['reason' => 'oops'])
+            ->assertForbidden();
+
+        $this->assertSame('completed', $sale->fresh()->status);
+    }
+
+    public function test_my_sales_lists_only_the_current_cashiers_sales(): void
+    {
+        $seed = $this->seedCoke();
+        $me = $this->cashier();
+        $other = $this->cashier();
+
+        $mine = $this->rungUpSale($seed['single'], as: $me);
+        $theirs = $this->rungUpSale($seed['single'], as: $other);
+
+        $data = $this->actingAs($me)->get('/my-sales')
+            ->viewData('page')['props']['sales']['data'];
+        $ids = collect($data)->pluck('id')->all();
+
+        $this->assertContains($mine->id, $ids);
+        $this->assertNotContains($theirs->id, $ids);
     }
 
     public function test_admin_can_void_a_sale_and_stock_is_restored(): void

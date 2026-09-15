@@ -1,11 +1,7 @@
 import { Head, Link, router, useForm, usePage } from '@inertiajs/react';
 import AuthenticatedLayout from '../../Layouts/AuthenticatedLayout';
 
-const money = (n) =>
-    Number(n || 0).toLocaleString(undefined, {
-        minimumFractionDigits: 2,
-        maximumFractionDigits: 2,
-    });
+import { money } from '../../money';
 
 const STATUS_BADGE = {
     completed: 'text-bg-success',
@@ -14,8 +10,7 @@ const STATUS_BADGE = {
 };
 
 export default function SaleShow() {
-    const { sale, auth } = usePage().props;
-    const canVoid = auth.user.is_admin && sale.status === 'completed';
+    const { sale, canVoid } = usePage().props;
 
     const voidForm = useForm({ reason: '' });
 
