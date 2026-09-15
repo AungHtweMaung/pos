@@ -43,7 +43,7 @@ Route::middleware('auth')->group(function () {
         ->group(function () {
             Route::get('low-stock', [LowStockController::class, 'index'])->name('low-stock');
 
-            Route::resource('products', ProductController::class);
+            Route::resource('products', ProductController::class)->except('show');
 
             Route::prefix('products/{product}')->group(function () {
                 Route::post('variants', [VariantController::class, 'store'])

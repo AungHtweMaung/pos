@@ -38,14 +38,27 @@ class DatabaseSeeder extends Seeder
             ]
         );
 
-        // Only seed the demo catalog when the products table is empty so
+        // Extra pharmacy counter staff so shifts can rotate.
+        foreach (['thida' => 'Ma Thida Win', 'kyawzin' => 'Ko Kyaw Zin'] as $username => $name) {
+            User::updateOrCreate(
+                ['username' => $username],
+                [
+                    'name' => $name,
+                    'password' => Hash::make('password'),
+                    'role' => UserRole::Cashier,
+                    'is_active' => true,
+                ]
+            );
+        }
+
+        // Only seed the pharmacy catalogue when the products table is empty so
         // repeated `db:seed` runs don't stack duplicates or hit the barcode
         // unique index.
         if (\App\Models\Product::query()->doesntExist()) {
-            $this->call(InventorySeeder::class);
+            $this->call(PharmacyCatalogSeeder::class);
         }
 
-        // A week of demo sales, voids, and closed shifts so the Sales, Reports
+        // 90 days of sales, voids, restocks and shifts so the Sales, Reports
         // and Shift-history screens have data. No-ops once sales exist.
         $this->call(DemoSalesSeeder::class);
     }
