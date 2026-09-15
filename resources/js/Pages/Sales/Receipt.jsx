@@ -1,11 +1,7 @@
 import { Head, Link, usePage } from '@inertiajs/react';
 import { useEffect } from 'react';
 
-const money = (n) =>
-    Number(n || 0).toLocaleString(undefined, {
-        minimumFractionDigits: 2,
-        maximumFractionDigits: 2,
-    });
+import { money } from '../../money';
 
 // Print-friendly receipt (spec §8.1 step 6). Standalone layout — no chrome,
 // no nav — so Ctrl+P prints just the slip. Screen shows action buttons that

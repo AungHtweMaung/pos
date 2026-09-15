@@ -44,5 +44,9 @@ class DatabaseSeeder extends Seeder
         if (\App\Models\Product::query()->doesntExist()) {
             $this->call(InventorySeeder::class);
         }
+
+        // A week of demo sales, voids, and closed shifts so the Sales, Reports
+        // and Shift-history screens have data. No-ops once sales exist.
+        $this->call(DemoSalesSeeder::class);
     }
 }

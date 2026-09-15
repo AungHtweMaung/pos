@@ -1,8 +1,8 @@
-import { Head, Link, router, usePage } from '@inertiajs/react';
-import { useState } from 'react';
+import { Head, Link, usePage } from '@inertiajs/react';
 import AuthenticatedLayout from '../../Layouts/AuthenticatedLayout';
-
 import { money } from '../../money';
+
+const dt = (v) => (v ? new Date(v).toLocaleString() : '—');
 
 const STATUS_BADGE = {
     completed: 'text-bg-success',
@@ -10,68 +10,37 @@ const STATUS_BADGE = {
     refunded: 'text-bg-warning',
 };
 
-export default function SalesIndex() {
-    const { sales, filters } = usePage().props;
-    const [q, setQ] = useState(filters?.q || '');
-    const [status, setStatus] = useState(filters?.status || '');
-
-    const search = (e) => {
-        e.preventDefault();
-        router.get(
-            '/sales',
-            { q, status },
-            { preserveState: true, replace: true },
-        );
-    };
+export default function MySales() {
+    const { sales, hasOpenShift } = usePage().props;
 
     return (
         <AuthenticatedLayout
             header={
-                <div>
-                    <h1 className="h4 mb-0">Sales history</h1>
-                    <p className="text-body-secondary small mb-0">
-                        Every completed, voided, or refunded sale.
-                    </p>
+                <div className="d-flex justify-content-between align-items-center">
+                    <div>
+                        <h1 className="h4 mb-0">My sales</h1>
+                        <p className="text-body-secondary small mb-0">
+                            Sales you rang up. Reprint a receipt, or void a mistake made
+                            during your current shift.
+                        </p>
+                    </div>
+                    <Link href="/pos" className="btn btn-primary">
+                        <i className="bi bi-cart me-1"></i>New sale
+                    </Link>
                 </div>
             }
         >
-            <Head title="Sales" />
+            <Head title="My sales" />
 
-            <form onSubmit={search} className="mb-3">
-                <div className="row g-2">
-                    <div className="col-md-6">
-                        <div className="input-group">
-                            <span className="input-group-text">
-                                <i className="bi bi-search"></i>
-                            </span>
-                            <input
-                                type="search"
-                                className="form-control"
-                                placeholder="Sale # or cashier name…"
-                                value={q}
-                                onChange={(e) => setQ(e.target.value)}
-                            />
-                        </div>
-                    </div>
-                    <div className="col-md-4">
-                        <select
-                            className="form-select"
-                            value={status}
-                            onChange={(e) => setStatus(e.target.value)}
-                        >
-                            <option value="">All statuses</option>
-                            <option value="completed">Completed</option>
-                            <option value="voided">Voided</option>
-                            <option value="refunded">Refunded</option>
-                        </select>
-                    </div>
-                    <div className="col-md-2">
-                        <button type="submit" className="btn btn-outline-secondary w-100">
-                            Filter
-                        </button>
+            {!hasOpenShift && (
+                <div className="alert alert-info d-flex align-items-center" role="alert">
+                    <i className="bi bi-info-circle me-2"></i>
+                    <div>
+                        You have no open shift, so sales can't be voided here. Open a shift
+                        from <Link href="/shift">End of Shift</Link>, or ask an admin to void.
                     </div>
                 </div>
-            </form>
+            )}
 
             <div className="card shadow-sm">
                 <div className="table-responsive">
@@ -80,26 +49,24 @@ export default function SalesIndex() {
                             <tr>
                                 <th>#</th>
                                 <th>When</th>
-                                <th>Cashier</th>
                                 <th>Payment</th>
                                 <th>Status</th>
-                                <th className="text-end">Grand total</th>
+                                <th className="text-end">Total</th>
                                 <th></th>
                             </tr>
                         </thead>
                         <tbody>
                             {sales.data.length === 0 && (
                                 <tr>
-                                    <td colSpan={7} className="text-center text-body-secondary py-4">
-                                        No sales match this filter.
+                                    <td colSpan={6} className="text-center text-body-secondary py-4">
+                                        You haven't rung up any sales yet.
                                     </td>
                                 </tr>
                             )}
                             {sales.data.map((s) => (
                                 <tr key={s.id}>
                                     <td className="fw-semibold">#{s.id}</td>
-                                    <td>{new Date(s.created_at).toLocaleString()}</td>
-                                    <td>{s.cashier?.name || '—'}</td>
+                                    <td>{dt(s.created_at)}</td>
                                     <td>
                                         <span className="badge text-bg-light">
                                             {s.payment_method}
@@ -117,17 +84,29 @@ export default function SalesIndex() {
                                     <td className="text-end">{money(s.grand_total)}</td>
                                     <td className="text-end">
                                         <Link
-                                            href={`/sales/${s.id}`}
-                                            className="btn btn-sm btn-outline-secondary me-1"
-                                        >
-                                            <i className="bi bi-eye"></i>
-                                        </Link>
-                                        <Link
                                             href={`/sales/${s.id}/receipt`}
-                                            className="btn btn-sm btn-outline-primary"
+                                            className="btn btn-sm btn-outline-primary me-1"
+                                            title="Receipt"
                                         >
                                             <i className="bi bi-receipt"></i>
                                         </Link>
+                                        {s.can_void ? (
+                                            <Link
+                                                href={`/sales/${s.id}`}
+                                                className="btn btn-sm btn-outline-danger"
+                                                title="Void this sale"
+                                            >
+                                                <i className="bi bi-x-octagon me-1"></i>Void
+                                            </Link>
+                                        ) : (
+                                            <Link
+                                                href={`/sales/${s.id}`}
+                                                className="btn btn-sm btn-outline-secondary"
+                                                title="View detail"
+                                            >
+                                                <i className="bi bi-eye"></i>
+                                            </Link>
+                                        )}
                                     </td>
                                 </tr>
                             ))}

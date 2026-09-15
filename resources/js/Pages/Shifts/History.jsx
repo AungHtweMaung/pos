@@ -1,11 +1,7 @@
 import { Head, Link, usePage } from '@inertiajs/react';
 import AuthenticatedLayout from '../../Layouts/AuthenticatedLayout';
 
-const money = (n) =>
-    Number(n || 0).toLocaleString(undefined, {
-        minimumFractionDigits: 2,
-        maximumFractionDigits: 2,
-    });
+import { money } from '../../money';
 
 const dt = (v) => (v ? new Date(v).toLocaleString() : '—');
 

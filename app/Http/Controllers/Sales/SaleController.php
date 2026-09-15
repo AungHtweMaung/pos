@@ -7,6 +7,8 @@ use App\Http\Requests\Sales\StoreSaleRequest;
 use App\Http\Requests\Sales\VoidSaleRequest;
 use App\Models\Sale;
 use App\Models\SaleUnit;
+use App\Models\Shift;
+use App\Models\User;
 use App\Models\Variant;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -53,6 +55,34 @@ class SaleController extends Controller
     public function create(): Response
     {
         return Inertia::render('Sales/Cart');
+    }
+
+    /**
+     * A cashier's own sales — the list they can browse to reprint a receipt
+     * or void a mistake they just made. Open to any authenticated user; each
+     * row carries whether the current user may still void it.
+     */
+    public function mySales(Request $request): Response
+    {
+        $user = $request->user();
+        $hasOpenShift = Shift::openFor($user->id)->exists();
+
+        $sales = Sale::where('cashier_id', $user->id)
+            ->latest('id')
+            ->paginate(20)
+            ->through(fn (Sale $sale) => [
+                'id' => $sale->id,
+                'created_at' => $sale->created_at,
+                'grand_total' => (float) $sale->grand_total,
+                'payment_method' => $sale->payment_method,
+                'status' => $sale->status,
+                'can_void' => $this->canVoid($user, $sale),
+            ]);
+
+        return Inertia::render('Sales/MySales', [
+            'sales' => $sales,
+            'hasOpenShift' => $hasOpenShift,
+        ]);
     }
 
     /**
@@ -206,6 +236,7 @@ class SaleController extends Controller
 
         return Inertia::render('Sales/Show', [
             'sale' => $sale,
+            'canVoid' => $this->canVoid($request->user(), $sale),
         ]);
     }
 
@@ -227,14 +258,18 @@ class SaleController extends Controller
     }
 
     /**
-     * Void or refund a completed sale (admin only). Restores stock to each
-     * variant and records who voided plus the reason.
+     * Void a completed sale and restore its stock. An admin may void any
+     * sale, anytime. A cashier may void only their own sale, and only while
+     * the shift they rang it up in is still open (see canVoid). Records who
+     * voided plus the reason.
      */
     public function void(VoidSaleRequest $request, Sale $sale): RedirectResponse
     {
         if ($sale->isVoided()) {
             return back()->with('error', 'Sale is already voided.');
         }
+
+        abort_unless($this->canVoid($request->user(), $sale), 403);
 
         DB::transaction(function () use ($sale, $request) {
             $sale->load('items.saleUnit');
@@ -275,5 +310,34 @@ class SaleController extends Controller
             !$user->isAdmin() && $sale->cashier_id !== $user->id,
             403,
         );
+    }
+
+    /**
+     * Whether the given user may void the given sale right now.
+     *
+     * - Admin: any completed sale, anytime.
+     * - Cashier: only their own completed sale, and only while the shift it
+     *   was rung up in is still open (the sale's timestamp falls on/after the
+     *   cashier's current open shift). This lets a cashier fix a fresh mistake
+     *   from the live drawer without letting them reach back into an already
+     *   closed, reconciled shift.
+     */
+    private function canVoid(User $user, Sale $sale): bool
+    {
+        if ($sale->status !== Sale::STATUS_COMPLETED) {
+            return false;
+        }
+
+        if ($user->isAdmin()) {
+            return true;
+        }
+
+        if ($sale->cashier_id !== $user->id) {
+            return false;
+        }
+
+        $openShift = Shift::openFor($user->id)->first();
+
+        return $openShift !== null && $sale->created_at >= $openShift->opened_at;
     }
 }

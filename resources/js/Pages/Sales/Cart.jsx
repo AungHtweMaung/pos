@@ -3,11 +3,7 @@ import { useEffect, useMemo, useRef, useState } from 'react';
 import AuthenticatedLayout from '../../Layouts/AuthenticatedLayout';
 
 // Money formatter — cashier-facing, 2dp, thousands separator.
-const money = (n) =>
-    Number(n || 0).toLocaleString(undefined, {
-        minimumFractionDigits: 2,
-        maximumFractionDigits: 2,
-    });
+import { money } from '../../money';
 
 const PAYMENT_METHODS = [
     { key: 'cash', label: 'Cash', icon: 'bi-cash-coin' },

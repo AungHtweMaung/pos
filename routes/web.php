@@ -74,20 +74,25 @@ Route::middleware('auth')->group(function () {
         Route::get('lookup', LookupController::class)->name('lookup');
     });
 
+    // A cashier's own sales list (reprint / self-void). Open to any user;
+    // registered before the `sales/{sale}` route so "my-sales" isn't captured
+    // as a sale id. Kept outside the `sales` group for a clean URL.
+    Route::get('my-sales', [SaleController::class, 'mySales'])->name('sales.mine');
+
     Route::prefix('sales')->name('sales.')->group(function () {
         // Receipt + detail: cashier can view own, admin can view any (the
         // controller enforces this).
         Route::get('{sale}/receipt', [SaleController::class, 'receipt'])->name('receipt');
         Route::get('{sale}', [SaleController::class, 'show'])->name('show');
 
-        // History + void are admin-only.
+        // Full history across all cashiers is admin-only.
         Route::middleware('can:view-reports')
             ->get('/', [SaleController::class, 'index'])
             ->name('index');
 
-        Route::middleware('can:void-sale')
-            ->post('{sale}/void', [SaleController::class, 'void'])
-            ->name('void');
+        // Void: reachable by any authenticated user; the controller enforces
+        // admin-any vs cashier-own-during-open-shift (spec §5 + shift rule).
+        Route::post('{sale}/void', [SaleController::class, 'void'])->name('void');
     });
 
     // Cashier / account management (§8.3) — admin only. Deactivate-not-delete
